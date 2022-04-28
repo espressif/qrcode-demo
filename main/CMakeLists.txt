@@ -1,6 +1,5 @@
 set(COMPONENT_SRCS "qrcode_app_main.cpp"
 "../lib/quirc_opencv.cpp"
-"map_calc.S"
 "camera/who_camera.c"
 "../quirc/lib/decode.c"
 "../quirc/lib/identify.c"
