@@ -1,5 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
+  espressif/esp-dsp: "==1.2.0"
   espressif/esp32-camera: "==2.0.0"
   ## Required IDF version
   idf:
