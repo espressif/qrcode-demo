@@ -35,7 +35,7 @@
 static QueueHandle_t xQueueAIFrame1 = NULL;
 static QueueHandle_t xQueueAIFrame2 = NULL;
 
-#include "perfmon.h"
+//#include "perfmon.h"
 
 static const char* TAG = "QRcode-app";
 #include "quirc.h"
