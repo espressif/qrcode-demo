@@ -7,7 +7,3 @@
 	path = quirc
 	url = https://github.com/dmitry1945/quirc.git
 
-[submodule "components/opencv"]
-	path = components/opencv
-	url = https://gitlab.espressif.cn:6688/igrokhotkov/opencv.git
-
