@@ -1,13 +1,15 @@
 idf_component_register(SRCS "qrcode_app_main.cpp"
                     "../lib/quirc_opencv.cpp"
-                    "camera/who_camera.c"
                     "../quirc/lib/decode.c"
                     "../quirc/lib/identify.c"
                     "../quirc/lib/quirc.c"
                     "../quirc/lib/version_db.c"
+                    # lcd.c camera.c
+                    lcd.c camera/who_camera.c
 
                     INCLUDE_DIRS "" "."
-                    "camera"
                     "../quirc/lib"
                     "../lib"
-                    REQUIRES opencvlib esp-dsp esp32-camera)
+                    camera
+                    REQUIRES opencvlib esp-dsp esp32-camera esp_lcd
+                    PRIV_REQUIRES esp_timer)

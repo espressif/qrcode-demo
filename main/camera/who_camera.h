@@ -193,7 +193,7 @@
 #define CAMERA_PIN_PCLK CONFIG_CAMERA_PIN_PCLK
 #endif
 
-#define XCLK_FREQ_HZ 15000000
+#define XCLK_FREQ_HZ 16000000
 
 #ifdef __cplusplus
 extern "C"

@@ -31,6 +31,7 @@
 #include "who_camera.h"
 
 #include "esp_dsp.h"
+#include "lcd.h"
 
 static QueueHandle_t xQueueAIFrame1 = NULL;
 static QueueHandle_t xQueueAIFrame2 = NULL;
@@ -70,6 +71,7 @@ void process_task(void* data)
 		if (xQueueReceive(xQueueAIFrame, &frame, portMAX_DELAY))
 		{
 			unsigned int start_b = xthal_get_ccount();
+			ESP_LOGI(TAG, "start");
 			uint8_t *buf = quirc_begin(qr, &w, &h);
 
 			for (size_t y = 0; y < h; y++)
@@ -93,21 +95,33 @@ void process_task(void* data)
 				unsigned int end_b = xthal_get_ccount();
 				if (err == 0)
 				{
+					board_led_set(1);
 					if (strstr((const char *)qr_data->payload, "RED") != NULL)
 					{
 						ESP_LOGE(TAG,"QR-code[%i]: %s, time = %i(ms)", qr_data->payload_len, qr_data->payload, (end_b - start_b)/240000);
+						lcd_fill(100, 0, 0);
 					}
 					else if (strstr((const char *)qr_data->payload, "YELLOW") != NULL)
 					{
 						ESP_LOGW(TAG,"QR-code[%i]: %s, time = %i(ms)", qr_data->payload_len, qr_data->payload, (end_b - start_b)/240000);
+						lcd_fill(100, 100, 0);
 					}
 					else if (strstr((const char *)qr_data->payload, "GREEN") != NULL)
 					{
 						ESP_LOGI(TAG,"QR-code[%i]: %s, time = %i(ms)", qr_data->payload_len, qr_data->payload, (end_b - start_b)/240000);
+						lcd_fill(0, 100, 0);
+					} else if (strstr((const char *)qr_data->payload, "BLUE") != NULL)
+					{
+						ESP_LOGI(TAG,"QR-code[%i]: %s, time = %i(ms)", qr_data->payload_len, qr_data->payload, (end_b - start_b)/240000);
+						lcd_fill(0, 0, 100);
 					} else
 					{
 						printf("QR-code[%i]: %s, time = %i(ms)\n", qr_data->payload_len, qr_data->payload, (end_b - start_b)/240000);
+						lcd_fill(30, 30, 30);
 					}
+					board_led_set(0);
+				} else {
+					// lcd_draw_grayscale(frame->buf, frame->width, frame->height);
 				}
 			}
 			esp_camera_fb_return(frame);
@@ -124,6 +138,8 @@ void app_main(void)
     xQueueAIFrame1 = xQueueCreate(2, sizeof(camera_fb_t *));
     xQueueAIFrame2 = xQueueCreate(2, sizeof(camera_fb_t *));
 
+    lcd_init();
+    lcd_fill(0, 0, 0);
     register_camera(PIXFORMAT_GRAYSCALE, FRAMESIZE_VGA, 2, xQueueAIFrame1, xQueueAIFrame2);
     xTaskCreatePinnedToCore(process_task, TAG, 16 * 1024, xQueueAIFrame1, 5, NULL, 0);
     xTaskCreatePinnedToCore(process_task, TAG, 16 * 1024, xQueueAIFrame2, 5, NULL, 1);
