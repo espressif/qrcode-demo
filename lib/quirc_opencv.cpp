@@ -12,6 +12,7 @@
 #include "quirc.h"
 #include "quirc_opencv.h"
 #include "quirc_internal.h"
+#include "quirc_opencv_c.h"
 
 static const char *TAG = "QRcode-opencv";
 #include "esp_log.h"
@@ -199,4 +200,15 @@ bool quirc_opencv::ConvertImage(struct quirc *qr)
         }
     }
     return true;
+}
+
+static quirc_opencv* s_quirc_opencv;
+
+extern "C" void quirc_opencv_init(void)
+{
+    s_quirc_opencv = new quirc_opencv();
+}
+extern "C" void quirc_opencv_rectify(struct quirc* qr)
+{
+    s_quirc_opencv->ConvertImage(qr);
 }
