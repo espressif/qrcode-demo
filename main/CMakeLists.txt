@@ -7,7 +7,6 @@ idf_component_register(SRCS "qrcode_app_new.c"
 
                     INCLUDE_DIRS "" "."
                     "../quirc/lib"
-                    "../lib"
 
                     PRIV_REQUIRES esp_timer pbm vfs fatfs)
 
