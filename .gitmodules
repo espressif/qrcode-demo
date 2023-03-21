@@ -5,5 +5,5 @@
 
 [submodule "quirc"]
 	path = quirc
-	url = https://github.com/dmitry1945/quirc.git
+	url = https://github.com/dlbeer/quirc.git
 

@@ -11,3 +11,5 @@ idf_component_register(SRCS "qrcode_app_new.c"
                     PRIV_REQUIRES esp_timer pbm vfs fatfs)
 
 
+target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_USE_TGMATH)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_FLOAT_TYPE=float)
