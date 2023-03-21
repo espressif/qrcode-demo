@@ -13,3 +13,4 @@ idf_component_register(SRCS "qrcode_app_new.c"
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_USE_TGMATH)
 target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_FLOAT_TYPE=float)
+target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
