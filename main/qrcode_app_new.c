@@ -30,7 +30,6 @@
 #include "esp_heap_caps.h"
 
 static const char *TAG = "example";
-static const char *s_image_name = NULL;
 static bool s_write_pics;
 static int64_t s_freeze_canvas_delay = 2000000;
 static int64_t s_freeze_canvas_until;
@@ -109,7 +108,7 @@ static void processing_task(void* arg)
 
         int res = xQueueReceive(input_queue, &pic, portMAX_DELAY);
         assert(res == pdPASS);
-        // ESP_LOGI(TAG, "Processing task got frame");
+
         int64_t t_start = esp_timer_get_time();
     
         rgb565_to_grayscale_buf(pic->buf, qr_buf, qr_width, qr_height);
@@ -139,7 +138,10 @@ static void processing_task(void* arg)
         int count = quirc_count(qr);
         quirc_decode_error_t err = QUIRC_ERROR_DATA_UNDERFLOW;
         int time_find_ms = (int)(t_end_find - t_start)/1000;
-        ESP_LOGI(TAG, "QR count: %d   Heap: %d   time: %d ms", count, heap_caps_get_free_size(MALLOC_CAP_DEFAULT), time_find_ms);
+        ESP_LOGI(TAG, "QR count: %d   Heap: %d  Stack free: %d  time: %d ms",
+            count, heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
+            uxTaskGetStackHighWaterMark(NULL), time_find_ms);
+
         for (int i = 0; i < count; i++) {
             struct quirc_code code = {};
             struct quirc_data qr_data = {};
@@ -205,7 +207,7 @@ void main_task(void* arg) {
     QueueHandle_t processing_queue = xQueueCreate(1, sizeof(camera_fb_t*));
     assert(processing_queue);
     
-    xTaskCreatePinnedToCore(&processing_task, "processing", 100000, processing_queue, 1, NULL, 0);
+    xTaskCreatePinnedToCore(&processing_task, "processing", 35000, processing_queue, 1, NULL, 0);
     ESP_LOGI(TAG, "Processing task started");
 
     while (1) {
@@ -217,10 +219,12 @@ void main_task(void* arg) {
                     lv_obj_invalidate(s_camera_canvas);
                     bsp_display_unlock();
                 }
-            }
 
-            int res = xQueueSend(processing_queue, &pic, pdMS_TO_TICKS(10));
-            if (res == pdFAIL) {
+                int res = xQueueSend(processing_queue, &pic, pdMS_TO_TICKS(10));
+                if (res == pdFAIL) {
+                    esp_camera_fb_return(pic);
+                }
+            } else {
                 esp_camera_fb_return(pic);
             }
         } else {
