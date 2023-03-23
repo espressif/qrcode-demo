@@ -47,3 +47,6 @@ coverage_report/
 
 # VS Code Settings
 .vscode/
+
+managed_components
+dependencies.lock

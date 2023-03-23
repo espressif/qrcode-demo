@@ -4,5 +4,6 @@ dependencies:
   espressif/esp32_s3_eye: "*"
   lvgl/lvgl: "*"
   espressif/esp_lvgl_port: "*"
+  espressif/quirc: "==1.2.0"
   idf:
     version: ">=5.0"

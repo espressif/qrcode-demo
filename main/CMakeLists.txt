@@ -1,16 +1,9 @@
 idf_component_register(SRCS "qrcode_app_new.c"
-                    "../quirc/lib/decode.c"
-                    "../quirc/lib/identify.c"
-                    "../quirc/lib/quirc.c"
-                    "../quirc/lib/version_db.c"
-                    "qrcode_classifier.c"
+                            "qrcode_classifier.c"
+                       INCLUDE_DIRS "" "."
+                       PRIV_REQUIRES esp_timer pbm vfs fatfs)
 
-                    INCLUDE_DIRS "" "."
-                    "../quirc/lib"
-
-                    PRIV_REQUIRES esp_timer pbm vfs fatfs)
-
-
-target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_USE_TGMATH)
-target_compile_definitions(${COMPONENT_LIB} PRIVATE QUIRC_FLOAT_TYPE=float)
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+idf_component_get_property(quirc_lib_name espressif__quirc COMPONENT_LIB)
+target_compile_options(${quirc_lib_name} PRIVATE -O3)
