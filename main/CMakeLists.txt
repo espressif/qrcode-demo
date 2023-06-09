@@ -1,13 +1,8 @@
-idf_component_register(SRCS "qrcode_app_main.cpp"
-                    "../lib/quirc_opencv.cpp"
-                    "camera/who_camera.c"
-                    "../quirc/lib/decode.c"
-                    "../quirc/lib/identify.c"
-                    "../quirc/lib/quirc.c"
-                    "../quirc/lib/version_db.c"
+idf_component_register(SRCS "qrcode_demo_main.c"
+                       INCLUDE_DIRS "."
+                       PRIV_REQUIRES esp_timer vfs fatfs classifier)
 
-                    INCLUDE_DIRS "" "."
-                    "camera"
-                    "../quirc/lib"
-                    "../lib"
-                    REQUIRES opencvlib esp-dsp esp32-camera)
+target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
+
+idf_component_get_property(quirc_lib_name espressif__quirc COMPONENT_LIB)
+target_compile_options(${quirc_lib_name} PRIVATE -O3)
