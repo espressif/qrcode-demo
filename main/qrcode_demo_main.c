@@ -21,8 +21,6 @@
 #include "quirc.h"
 #include "quirc_internal.h"
 #include "esp_timer.h"
-#include "pbm.h"
-#include "esp_vfs_semihost.h"
 #include "driver/sdmmc_host.h"
 #include "esp_vfs_fat.h"
 #include "src/misc/lv_color.h"
@@ -30,7 +28,6 @@
 #include "esp_heap_caps.h"
 
 static const char *TAG = "example";
-static bool s_write_pics;
 static int64_t s_freeze_canvas_delay = 2000000;
 static int64_t s_freeze_canvas_until;
 static lv_obj_t *s_camera_canvas;
@@ -117,23 +114,10 @@ static void processing_task(void* arg)
         
         esp_camera_fb_return(pic);
 
-        if (s_write_pics) {
-            char pgm_filename[32];
-            snprintf(pgm_filename, sizeof(pgm_filename), "/data/pic%04dp.pgm", frame);
-            ESP_LOGI(TAG, "Writing original pic %s", pgm_filename);
-            pgm_save(pgm_filename, qr_width, qr_height, qr_buf);
-        }
         ++frame;
         quirc_end(qr);
 
         int64_t t_end_find = esp_timer_get_time();
-
-        if (s_write_pics) {
-            char pgm_filename[32];
-            snprintf(pgm_filename, sizeof(pgm_filename), "/data/pic%04dr.pgm", frame);
-            ESP_LOGI(TAG, "Writing rectified pic %s", pgm_filename);
-            pgm_save(pgm_filename, qr_width, qr_height, qr->pixels);
-        }
 
         int count = quirc_count(qr);
         quirc_decode_error_t err = QUIRC_ERROR_DATA_UNDERFLOW;
@@ -162,8 +146,12 @@ static void processing_task(void* arg)
                     display_set_color(r, g, b);
                 } else {
                     const char* filename = classifier_get_pic_from_qrcode_data((const char*) qr_data.payload);
-                    ESP_LOGI(TAG, "QR-code: %d bytes: '%s'. Classified as '%s'.", qr_data.payload_len, qr_data.payload, filename);
-                    display_set_icon(filename);
+                    if (filename == NULL) {
+                        ESP_LOGI(TAG, "QR-code: %d bytes: '%s'. Classifier returned NULL.", qr_data.payload_len, qr_data.payload);
+                    } else {
+                        ESP_LOGI(TAG, "QR-code: %d bytes: '%s'. Classified as '%s'.", qr_data.payload_len, qr_data.payload, filename);
+                        display_set_icon(filename);
+                    }
                 }
                 bsp_led_set(BSP_LED_GREEN, false);
             }
@@ -264,20 +252,8 @@ static void sdcard_mount(void)
     esp_err_t err = esp_vfs_fat_sdmmc_mount("/data", &host, &slot_config, &mount_config, &bsp_sdcard);
     if (err == ESP_OK) {
         ESP_LOGI(TAG, "SD Card mounted");
-        // s_write_pics = true;
     } else {
         ESP_LOGI(TAG, "No SD card");
-    }
-}
-
-static void semihosting_mount(void)
-{
-    esp_err_t err = esp_vfs_semihost_register("/data");
-    if (err == ESP_OK) {
-        ESP_LOGI(TAG, "Semihosting started");
-        s_write_pics = true;
-    } else {
-        ESP_LOGI(TAG, "Semihosting start failed");
     }
 }
 
