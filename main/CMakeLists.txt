@@ -1,7 +1,6 @@
-idf_component_register(SRCS "qrcode_app_new.c"
-                            "qrcode_classifier.c"
-                       INCLUDE_DIRS "" "."
-                       PRIV_REQUIRES esp_timer pbm vfs fatfs)
+idf_component_register(SRCS "qrcode_demo_main.c"
+                       INCLUDE_DIRS "."
+                       PRIV_REQUIRES esp_timer vfs fatfs classifier)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -O3)
 
