@@ -29,7 +29,27 @@ To flash the demo to the board and see the console output, run:
 idf.py flash monitor
 ```
 
-## Preparing the SD Card
+## Expected output
+
+The demo will capture frames from the camera and decode them. Results of the decoding process will be shown in console (`idf.py monitor`).
+
+When no QR code is found in the frame, the following line will be printed in console:
+```
+I (64266) example: QR count: 0   Heap: 8086720  Stack free: 11692  time: 22 ms
+```
+
+When a QR code is detected, the data embedded into QR code will be shown:
+```
+I (64823) example: QR count: 1   Heap: 8086720  Stack free: 11692  time: 229 ms
+I (64827) example: Decoded in 3 ms
+I (64827) example: QR code: 62 bytes: 'https://www.espressif.com/en/products/devkits/esp-eye/overview'
+```
+
+## Preparing the SD Card (optional)
+
+For visual feedback, this demo can also display an image on the LCD, based on the contents of the QR code. For example, you can show a "Wi-Fi" icon when the QR code contains information about a Wi-Fi AP credentials.
+
+To use this feature, you need to prepare an SD card and put a few files there.
 
 Make sure the SD card is formatted as FAT, and place the following files on the card:
 
@@ -39,6 +59,8 @@ Make sure the SD card is formatted as FAT, and place the following files on the 
    .* unknown.png
    ```
 2. For each classifier, a PNG file with a 192x192 image. With the example above, `wifi.png` and `unknown.png`.
+
+If SD card is not detected when the demo starts up, it will proceed without this feature.
 
 ## License
 
